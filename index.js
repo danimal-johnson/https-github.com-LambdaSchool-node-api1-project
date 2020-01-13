@@ -86,7 +86,9 @@ server.put('/api/users/:id', (req, res) => {
     db.update(id, userData)
     .then (updated => {
       if (updated) {
-        res.status(200).json(userData);
+        db.findById(id)
+          .then(user => res.status(200).json(user)); // Is this robust enough?
+        // res.status(200).json(userData); // Doesn't return new object
       }
       else {
         res.status(404).json({
