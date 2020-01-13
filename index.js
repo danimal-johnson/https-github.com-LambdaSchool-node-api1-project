@@ -72,6 +72,7 @@ server.post('/api/users', (req, res) => {
 });
 
 // ** MODIFY a user (PUT) **
+// Fully functional
 server.put('/api/users/:id', (req, res) => {
   let id = req.params.id;
   const userData = req.body;
@@ -82,7 +83,17 @@ server.put('/api/users/:id', (req, res) => {
     })
   }
   else{
-    res.status(200).json({ message: "Fix this"}); // TODO
+    db.update(id, userData)
+    .then (updated => {
+      if (updated) {
+        res.status(200).json(userData);
+      }
+      else {
+        res.status(404).json({
+          errorMessage: "The user information could not be modified."
+        });
+      }
+    });
   }
 });
 
