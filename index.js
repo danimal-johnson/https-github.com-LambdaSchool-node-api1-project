@@ -11,7 +11,7 @@ server.use(express.json());
 
 // ** Test that the server is working **
 server.get('/', (req, res) => {
-  res.send({ api: 'Up and running...'})
+  res.send({ api: 'Up and running...'});
 });
 
 // ** GET all users **
@@ -29,6 +29,7 @@ server.get('/api/users', (req, res) => {
 });
 
 // ** GET a specific user **
+// Response for unknown user may not be correct
 server.get('/api/users/:id', (req, res) => {
   let id = req.params.id;
   db.findById(id) // Get commands from /data/db.js file
@@ -45,6 +46,68 @@ server.get('/api/users/:id', (req, res) => {
       console.log("Server error on GET /api/user/:id");
       res.status(500).json({ error: "The user information could not be retrieved."});
     });
+});
+
+// ** Add a new user (POST)
+server.post('/api/users', (req, res) => {
+  const userData = req.body;
+  console.log("Attempting to add user:", userData);
+  if( !userData.name || !userData.bio ) {
+    res.status(400).json({ 
+      errorMessage : "Please provide name and bio for the user."
+    })
+  }
+  else { 
+    db.insert(userData)
+      .then(user => {
+        res.status(201).json(user); // Is this the NEWLY CREATED version?
+      })
+      .catch(err => {
+        console.log("Error on POST /api/users:", err);
+        res.status(500).json({
+          errorMessage: "There was an error while saving the user to the database"
+        });
+      })
+  }
+});
+
+// ** MODIFY a user (PUT) **
+server.put('/api/users/:id', (req, res) => {
+  let id = req.params.id;
+  const userData = req.body;
+
+  if ( !userData.name || !userData.bio ) { // You must try to change at least ONE field
+    res.status(400).json({
+      errorMessage: "Please provide name and bio for the user."
+    })
+  }
+  else{
+    res.status(200).json({ message: "Fix this"}); // TODO
+  }
+});
+
+// ** DELETE a user **
+// Fully functional
+server.delete('/api/users/:id', (req, res) => {
+  let id = req.params.id;
+  db.remove(id)
+    .then(removed => {
+      if(removed) {
+        res.status(200).json({
+          message: `User ID ${id} successfully deleted`
+        });
+      }
+      else {
+        res.status(404).json({message: "The user with the specified ID does not exist."})
+      }
+    })
+    .catch(err => {
+      console.log(`Error deleting ${id}: ${err}`);
+      res.status(500).json({
+          errorMessage: "The user could not be removed"
+        });
+    });
+
 });
 
 
