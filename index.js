@@ -77,8 +77,7 @@ server.put('/api/users/:id', (req, res) => {
   let id = req.params.id;
   const userData = req.body;
 
-  if ( !userData.name || !userData.bio ) { // You must try to change at least ONE field
-    res.status(400).json({
+  if ( !userData.name || !userData.bio ) { // Both fields are required
       errorMessage: "Please provide name and bio for the user."
     })
   }
