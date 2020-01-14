@@ -78,6 +78,7 @@ server.put('/api/users/:id', (req, res) => {
   const userData = req.body;
 
   if ( !userData.name || !userData.bio ) { // Both fields are required
+    res.status(400).json({
       errorMessage: "Please provide name and bio for the user."
     })
   }
